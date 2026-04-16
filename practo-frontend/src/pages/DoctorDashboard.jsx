@@ -8,20 +8,29 @@ function DoctorDashboard() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const data = await getDoctorAppointments();
-        setAppointments(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
+ useEffect(() => {
+   const fetchAppointments = async () => {
+     try {
+       const data = await getDoctorAppointments();
+       setAppointments(data);
+     } catch (error) {
+       console.error(error);
+     } finally {
+       setLoading(false);
+     }
+   };
 
-    fetchAppointments();
-  }, []);
+   // first load immediately
+   fetchAppointments();
+
+   // auto refresh every 30 sec
+   const intervalId = setInterval(() => {
+     fetchAppointments();
+   }, 30000);
+
+   // cleanup on unmount
+   return () => clearInterval(intervalId);
+ }, []);
 
   const handleStatusUpdate = async (appointmentId, newStatus) => {
     try {
