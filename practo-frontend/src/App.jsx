@@ -1,4 +1,5 @@
 import HomePage from "./pages/HomePage";
+import Register from "./pages/Register";
 import DoctorProfile from "./pages/DoctorProfile";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -15,6 +16,7 @@ function App() {
       <Navbar />
 
       <Routes>
+        <Route path="/register" element={<Register />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/doctor/:id" element={<DoctorProfile />} />
         <Route path="/login" element={<Login />} />
