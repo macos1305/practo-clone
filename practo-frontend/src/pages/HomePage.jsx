@@ -6,6 +6,7 @@ function HomePage() {
   const [doctors, setDoctors] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [specialization, setSpecialization] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -19,13 +20,21 @@ function HomePage() {
   const filteredDoctors = doctors.filter((doctor) => {
     const matchesName = doctor.name
       .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+      .includes(debouncedSearchTerm.toLowerCase());
 
     const matchesSpecialization =
       specialization === "" || doctor.specialization === specialization;
 
     return matchesName && matchesSpecialization;
   });
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
 
   return (
     <div className="p-6">

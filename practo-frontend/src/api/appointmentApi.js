@@ -1,4 +1,4 @@
-import apiClient from "../services/apiClient";
+import apiClient from "./apiClient";
 export const bookAppointment = async ({ doctorId, slotId }) => {
   const response = await apiClient.post(`/appointments`, {
     doctorId,
