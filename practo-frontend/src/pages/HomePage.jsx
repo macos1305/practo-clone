@@ -7,6 +7,7 @@ function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [specialization, setSpecialization] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("");
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -26,6 +27,21 @@ function HomePage() {
       specialization === "" || doctor.specialization === specialization;
 
     return matchesName && matchesSpecialization;
+  });
+  const sortedDoctors = [...filteredDoctors].sort((a, b) => {
+    if (sortBy === "expHigh") {
+      return b.experience - a.experience;
+    }
+
+    if (sortBy === "expLow") {
+      return a.experience - b.experience;
+    }
+
+    if (sortBy === "name") {
+      return a.name.localeCompare(b.name);
+    }
+
+    return 0;
   });
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -47,6 +63,16 @@ function HomePage() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border p-2 rounded w-full"
         />
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="border p-2 rounded"
+        >
+          <option value="">Sort By</option>
+          <option value="expHigh">Experience: High to Low</option>
+          <option value="expLow">Experience: Low to High</option>
+          <option value="name">Name: A to Z</option>
+        </select>
 
         <select
           value={specialization}
@@ -63,7 +89,7 @@ function HomePage() {
 
       {/* Cards */}
       <div className="grid grid-cols-3 gap-6">
-        {filteredDoctors.map((doctor) => (
+        {sortedDoctors.map((doctor) => (
           <DoctorCard key={doctor.id} doctor={doctor} />
         ))}
       </div>

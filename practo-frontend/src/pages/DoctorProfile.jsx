@@ -1,16 +1,21 @@
 import { useState, useEffect } from "react";
 import { getDoctorById, getDoctorSlots } from "../api/doctorApi";
-import { bookAppointment } from "../api/appointmentApi";
+import { bookAppointment, rescheduleAppointment } from "../api/appointmentApi";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-
 
 function DoctorProfile() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
+  const appointmentId = searchParams.get("appointmentId");
+
   const [doctor, setDoctor] = useState(null);
   const [slots, setSlots] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchParams] = useSearchParams();
-  const appointmentId = searchParams.get("appointmentId");
+
+  const today = new Date().toISOString().split("T")[0];
+  const [selectedDate, setSelectedDate] = useState(today);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,7 +26,7 @@ function DoctorProfile() {
         setDoctor(doctorData);
         setSlots(slotsData);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error(error);
       } finally {
         setLoading(false);
       }
@@ -30,12 +35,11 @@ function DoctorProfile() {
     fetchData();
   }, [id]);
 
-  if (loading) return <p>Loading...</p>;
   const handleSlotClick = async (slot) => {
     try {
       if (appointmentId) {
         await rescheduleAppointment(appointmentId, slot.id);
-        alert("Appointment rescheduled successfully!");
+        alert("Appointment rescheduled!");
         navigate("/dashboard");
       } else {
         await bookAppointment({
@@ -43,70 +47,96 @@ function DoctorProfile() {
           slotId: slot.id,
         });
 
-        alert("Appointment booked successfully!");
+        alert("Appointment booked!");
       }
 
-      setSlots((prevSlots) =>
-        prevSlots.map((s) =>
-          s.id === slot.id ? { ...s, status: "BOOKED" } : s,
-        ),
+      setSlots((prev) =>
+        prev.map((s) => (s.id === slot.id ? { ...s, status: "BOOKED" } : s)),
       );
     } catch (error) {
-      if (error.response?.status === 409) {
-        alert("Slot already booked");
-      } else {
-        alert("Something went wrong");
-      }
+      alert("Something went wrong");
     }
   };
+
+  const next7Days = [...Array(7)].map((_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() + i);
+
+    return {
+      label: date.toLocaleDateString([], {
+        weekday: "short",
+        day: "numeric",
+      }),
+      value: date.toISOString().split("T")[0],
+    };
+  });
+
+  const visibleSlots = slots.filter((slot) => {
+    const slotDate = new Date(slot.startTime).toISOString().split("T")[0];
+
+    return slotDate === selectedDate;
+  });
+
+  if (loading) return <p>Loading...</p>;
+
   return (
-    <div>
+    <div className="p-6 max-w-5xl mx-auto">
       {doctor && (
-        <div>
-          <h2>{doctor.name}</h2>
-          <p>Specialization: {doctor.specialization}</p>
+        <div className="mb-6 border rounded-lg p-4 shadow">
+          <h2 className="text-2xl font-bold">{doctor.name}</h2>
+
+          <p>{doctor.specialization}</p>
           <p>Experience: {doctor.experience} years</p>
         </div>
       )}
 
-      <div>
-        <h3>Available Slots</h3>
-        {appointmentId ? (
-          <p className="text-blue-600 font-semibold">
-            Select a new slot to reschedule appointment
-          </p>
-        ) : (
-          <p>Select a slot to book appointment</p>
-        )}
+      <h3 className="text-xl font-semibold mb-3">Select Day</h3>
 
-        {slots.length > 0 ? (
-          <ul>
-            {slots.map((slot) => {
-              const isBooked = slot.status === "BOOKED";
-
-              return (
-                <li
-                  onClick={!isBooked ? () => handleSlotClick(slot) : undefined}
-                  key={slot.id}
-                  className={`p-2 border rounded mb-2 ${
-                    isBooked
-                      ? "bg-gray-300 cursor-not-allowed"
-                      : "bg-green-100 cursor-pointer hover:bg-green-200"
-                  }`}
-                >
-                  Start: {slot.startTime} | End: {slot.endTime} | Status:{" "}
-                  {slot.status}
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <p>No slots available</p>
-        )}
+      <div className="flex gap-3 mb-6 overflow-x-auto">
+        {next7Days.map((day) => (
+          <button
+            key={day.value}
+            onClick={() => setSelectedDate(day.value)}
+            className={`px-4 py-2 rounded border whitespace-nowrap ${
+              selectedDate === day.value ? "bg-blue-500 text-white" : "bg-white"
+            }`}
+          >
+            {day.label}
+          </button>
+        ))}
       </div>
+
+      <h3 className="text-xl font-semibold mb-3">Available Slots</h3>
+
+      {visibleSlots.length > 0 ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          {visibleSlots.map((slot) => {
+            const isBooked = slot.status === "BOOKED";
+
+            return (
+              <button
+                key={slot.id}
+                disabled={isBooked}
+                onClick={() => !isBooked && handleSlotClick(slot)}
+                className={`p-3 rounded border ${
+                  isBooked
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-green-100 hover:bg-green-200"
+                }`}
+              >
+                {new Date(slot.startTime).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <p>No slots available</p>
+      )}
     </div>
   );
 }
-
 
 export default DoctorProfile;
