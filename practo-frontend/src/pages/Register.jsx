@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { register } from "../api/authApi";
+import toast from "react-hot-toast";
 
 function Register() {
   const navigate = useNavigate();
@@ -13,16 +14,16 @@ function Register() {
     const confirmPassword = e.target.confirmPassword.value;
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
     try {
       await register({ name, email, password });
-      alert("Account created successfully");
+      toast.success("Account created successfully");
       navigate("/login");
     } catch (error) {
-      alert("Registration failed");
+      toast.error("Registration failed");
     }
   };
 

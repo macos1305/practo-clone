@@ -2,6 +2,7 @@ import { login } from "../api/authApi";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 function Login() {
   const { user, setUser, loading } = useAuth();
@@ -26,7 +27,7 @@ function Login() {
       setUser(userData);
       navigate("/dashboard"); // ✅ correct redirect
     } catch (error) {
-      alert("Login failed. Please check your credentials.");
+      toast.error("Login failed. Please check your credentials.");
     }
   };
 

@@ -3,6 +3,7 @@ import {
   getDoctorAppointments,
   updateAppointmentStatus,
 } from "../api/appointmentApi";
+import toast from "react-hot-toast";
 
 function DoctorDashboard() {
   const [appointments, setAppointments] = useState([]);
@@ -14,6 +15,7 @@ function DoctorDashboard() {
        const data = await getDoctorAppointments();
        setAppointments(data);
      } catch (error) {
+       toast.error("Failed to fetch appointments");
        console.error(error);
      } finally {
        setLoading(false);
@@ -43,7 +45,7 @@ function DoctorDashboard() {
       );
     } catch (error) {
       console.error(error);
-      alert("Failed to update status");
+      toast.error("Failed to update status");
     }
   };
 

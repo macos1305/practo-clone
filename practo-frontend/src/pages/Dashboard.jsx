@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getDoctorById, getDoctorSlots } from "../api/doctorApi";
 import { bookAppointment, rescheduleAppointment } from "../api/appointmentApi";
-
+import toast from "react-hot-toast";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 
 function DoctorProfile() {
@@ -96,7 +96,7 @@ function DoctorProfile() {
       setSelectedSlot(null);
     } catch (error) {
       console.error(error);
-      alert("Payment/booking failed");
+      toast.error("Payment/booking failed");
     }
   };
 

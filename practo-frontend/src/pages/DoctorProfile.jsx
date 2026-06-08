@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { getDoctorById, getDoctorSlots } from "../api/doctorApi";
 import { bookAppointment, rescheduleAppointment } from "../api/appointmentApi";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function DoctorProfile() {
   const { id } = useParams();
@@ -39,7 +40,7 @@ function DoctorProfile() {
     try {
       if (appointmentId) {
         await rescheduleAppointment(appointmentId, slot.id);
-        alert("Appointment rescheduled!");
+        toast.success("Appointment rescheduled!");
         navigate("/dashboard");
       } else {
         await bookAppointment({
@@ -47,14 +48,14 @@ function DoctorProfile() {
           slotId: slot.id,
         });
 
-        alert("Appointment booked!");
+        toast.success("Appointment booked!");
       }
 
       setSlots((prev) =>
         prev.map((s) => (s.id === slot.id ? { ...s, status: "BOOKED" } : s)),
       );
     } catch (error) {
-      alert("Something went wrong");
+      toast.error("Something went wrong");
     }
   };
 
