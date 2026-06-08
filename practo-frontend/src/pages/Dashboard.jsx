@@ -3,6 +3,7 @@ import { getDoctorById, getDoctorSlots } from "../api/doctorApi";
 import { bookAppointment, rescheduleAppointment } from "../api/appointmentApi";
 import toast from "react-hot-toast";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { generateReceipt } from "../utils/generateReceipt";
 
 function DoctorProfile() {
   const { id } = useParams();
@@ -196,6 +197,21 @@ function DoctorProfile() {
       ) : (
         <p>No slots available</p>
       )}
+      <button
+        onClick={() =>
+          generateReceipt({
+            patientName: "Current User",
+            doctorName: appt.doctorName,
+            appointmentTime: appt.startTime,
+            appointmentId: appt.id,
+            amount: 500,
+            status: appt.status,
+          })
+        }
+        className="px-3 py-1 bg-purple-500 text-white rounded"
+      >
+        Download Receipt
+      </button>
 
       {/* Payment Modal */}
       {showPayment && selectedSlot && (
