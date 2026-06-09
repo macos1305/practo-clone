@@ -171,7 +171,7 @@ function DoctorProfile() {
       <h3 className="text-xl font-semibold mb-3">Available Slots</h3>
 
       {visibleSlots.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {visibleSlots.map((slot) => {
             const isBooked = slot.status === "BOOKED";
 
@@ -216,7 +216,7 @@ function DoctorProfile() {
       {/* Payment Modal */}
       {showPayment && selectedSlot && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40">
-          <div className="bg-white p-6 rounded-xl shadow-xl w-96">
+          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md ">
             <h2 className="text-2xl font-bold mb-4">Confirm Payment</h2>
 
             <p className="mb-2">Doctor: {doctor.name}</p>

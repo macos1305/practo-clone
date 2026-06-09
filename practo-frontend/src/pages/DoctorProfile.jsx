@@ -110,7 +110,7 @@ function DoctorProfile() {
       <h3 className="text-xl font-semibold mb-3">Available Slots</h3>
 
       {visibleSlots.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {visibleSlots.map((slot) => {
             const isBooked = slot.status === "BOOKED";
 
