@@ -1,12 +1,10 @@
-
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
 });
-
-
 
 // REQUEST INTERCEPTOR
 apiClient.interceptors.request.use(
@@ -32,22 +30,24 @@ apiClient.interceptors.response.use(
 
     // Unauthorized
     if (error.response?.status === 401) {
+      toast.error("Please login first");
+
       window.location.href = "/login";
     }
 
     // Forbidden
     if (error.response?.status === 403) {
-      alert("Access denied");
+      toast.error("Access denied");
     }
 
-    // Server error
+    // Server Error
     if (error.response?.status >= 500) {
-      alert("Server error. Please try again later.");
+      toast.error("Server error. Please try again later.");
     }
 
-    // Network error
+    // Network Error
     if (!error.response) {
-      alert("Network error. Check your internet connection.");
+      toast.error("Network error. Check your internet connection.");
     }
 
     return Promise.reject(error);
