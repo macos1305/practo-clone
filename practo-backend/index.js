@@ -7,9 +7,11 @@ dotenv.config();
 
 const app = express();
 
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
 
+// CORS
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -17,10 +19,12 @@ app.use(
   }),
 );
 
+// Test Route
 app.get("/", (req, res) => {
   res.send("Backend is running");
 });
 
+// PORT
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
