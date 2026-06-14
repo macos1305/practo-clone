@@ -16,10 +16,10 @@ function App() {
       <Navbar />
 
       <Routes>
-        <Route path="/register" element={<Register />} />
         <Route path="/" element={<HomePage />} />
-        <Route path="/doctor/:id" element={<DoctorProfile />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/doctor/:id" element={<DoctorProfile />} />
 
         <Route
           path="/dashboard"
@@ -38,6 +38,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route path="*" element={<p>Page Not Found</p>} />
       </Routes>
     </div>
   );
