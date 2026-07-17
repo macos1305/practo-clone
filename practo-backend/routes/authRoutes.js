@@ -24,7 +24,7 @@ router.post("/register", async (req, res) => {
   return res.json(user);
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res,next) => {
   const { email } = req.body;
 
   const user = {

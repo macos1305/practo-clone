@@ -1,45 +1,100 @@
 const jwt = require("jsonwebtoken");
+const authService = require("../services/authService");
 
 async function register(req, res) {
-  const { name, email, password } = req.body;
+  try {
+    const { name, email, password, role } = req.body;
 
-  // temporary demo user
-  const user = {
-    id: 1,
-    name,
-    email,
-    role: "patient",
-  };
+    const user = await authService.register({
+      name,
+      email,
+      password,
+      role,
+    });
 
-  const token = jwt.sign(user, process.env.JWT_SECRET);
+    const token = jwt.sign(
+      {
+        id: user.id,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      },
+    );
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-  });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
-  return res.json(user);
+    return res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      data: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 }
 
 async function login(req, res) {
-  const { email } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = {
-    id: 1,
-    email,
-    role: "patient",
-  };
+    // Authenticate user
+    const user = await authService.login({
+      email,
+      password,
+    });
 
-  const token = jwt.sign(user, process.env.JWT_SECRET);
+    // Generate JWT
+    const token = jwt.sign(
+      {
+        id: user.id,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      },
+    );
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-  });
+    // Send JWT in cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
-  return res.json(user);
+    // Send user data (without password)
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+      data: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      message: error.message,
+    });
+  }
 }
 
 async function logout(req, res) {

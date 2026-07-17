@@ -8,6 +8,7 @@ dotenv.config();
 const app = express();
 
 const authRoutes = require("./routes/authRoutes");
+const errorHandler = require("./middleware/errorHandler");
 
 // Middleware
 app.use(express.json());
@@ -28,9 +29,13 @@ app.get("/", (req, res) => {
   res.send("Backend is running");
 });
 
+// Global Error Handler (always after routes)
+app.use(errorHandler);
+
 // PORT
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
